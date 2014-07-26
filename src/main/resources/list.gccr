@@ -1,0 +1,207 @@
+ldc 2
+ldc 5
+ldc 9
+ldc 1
+
+ldc 4
+ldf $mk-list
+ap 1
+
+ldf $is-gt-4
+ldf $filter
+ap 2
+rtn
+
+$is-gt-4: ; x
+ld 0 0
+ldc 2
+cgt
+rtn
+
+$filter: ; lst pred
+ld 0 0   ; lst
+ldc 0    ; nil
+ldf $filter-pred
+ldf $fold-left
+ap 3
+ldf $reverse
+ap 1
+rtn
+$filter-pred: ; acc next
+ld 0 1   ; next
+ld 1 1   ; pred
+ap 1
+tsel $filter-pred-true $filter-pred-false
+$filter-pred-true:
+ld 0 1   ; next
+ld 0 0   ; acc
+cons
+rtn
+$filter-pred-false:
+ld 0 0   ; acc
+rtn
+
+$zip-with-index: ; lst
+ld 0 0       ; lst
+ld 0 0
+ldf $length
+ap 1         ; len lst
+ldf $range
+ap 1         ; 0..n
+ldf $zip
+ap 2         ; zip lst 0..n
+rtn
+
+$zip: ; a b
+ld 0 0
+ld 0 1
+ldc 0  ; nil
+ldf $zip_iter
+ap 3
+rtn
+$zip_iter: ; a b out
+ld 0 0
+atom
+tsel $zip_done $zip_next
+$zip_next:
+ld 0 1
+atom
+tsel $zip_done $zip_cont
+$zip_done:
+ld 0 2
+ldf $reverse
+ap 1
+rtn
+$zip_cont:
+ld 0 0
+cdr    ; tail a
+ld 0 1
+cdr    ; tail b
+ld 0 0
+car    ; head a
+ld 0 1
+car    ; head b
+cons   ; (a b)
+ld 0 2
+cons   ; (a b) :: out
+ldf $zip_iter
+tap 3
+
+$length: ;lst
+ldc 0
+ld 0 0
+ldf $length_iter
+ap 2
+rtn
+$length_iter: ; len lst
+ld 0 1
+atom
+tsel $length_done $length_cont
+$length_done:
+ld 0 0
+rtn
+$length_cont:
+ld 0 0
+ldc 1
+add     ; len+1
+ld 0 1
+cdr     ; tail lst
+ldf $length_iter
+tap 2
+
+$range: ;n
+ldc 0
+ld 0 0 ; n
+ldf $range_iter
+ap 2
+rtn
+$range_iter: ; i n
+ld 0 0
+ld 0 1
+ceq
+tsel $range_done $range_cont
+$range_done:
+ld 0 1  ; n
+ldf $mk-list
+ap 1
+rtn
+$range_cont:
+ld 0 0 ; i, left on stack for mk-list
+ld 0 0
+ldc 1
+add    ; i+1
+ld 0 1 ; n
+ldf $range_iter
+tap 2
+
+
+$mk-list: ;x
+ldc 0   ; nil
+ld 0 0
+ldf $mk-cons
+ap 1
+rtn
+
+$mk-cons: ;x
+ld 0 0
+ldc 0
+ceq
+tsel $mk-cons-zero $mk-cons-else
+$mk-cons-zero:
+rtn
+$mk-cons-else:
+cons
+ld 0 0
+ldc 1
+sub
+ldf $mk-cons
+tap 1
+
+$map: ; lst fun
+ld 0 0   ; lst
+ldc 0    ; nil
+ldf $apply-fun
+ldf $fold-left
+ap 3
+ldf $reverse
+ap 1
+rtn
+$apply-fun: ; acc next
+ld 0 1   ; next
+ld 1 1   ; fun
+ap 1
+ld 0 0   ; acc
+cons
+rtn
+
+$reverse: ; lst
+ld 0 0   ; lst
+ldc 0    ; nil
+ldf $reverse_fun
+ldf $fold-left
+ap 3
+rtn
+$reverse_fun: ; acc next
+ld 0 1   ; next
+ld 0 0   ; acc
+cons
+rtn
+
+$fold-left: ; lst acc fun
+ld 0 0   ; lst
+atom
+tsel $fold-left-base $fold-left-rec
+$fold-left-base:
+ld 0 1   ; acc
+rtn
+$fold-left-rec:
+ld 0 0
+cdr      ; tail lst
+ld 0 1
+ld 0 0
+car
+ld 0 2
+ap 2     ; fun acc (head list)
+ld 0 2   ; fun
+ldf $fold-left
+tap 3

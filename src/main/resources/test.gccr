@@ -1,0 +1,33 @@
+ldc 0
+dum 1
+ldf $n
+rap 1
+
+$n:
+ldc 3
+ldf $inc-by-x
+ap 1
+st 0 0
+
+ldc 2
+ld 0 0
+ap 1
+
+dbug
+
+ldc 4
+ld 0 0
+ap 1
+
+dbug
+
+rtn
+
+$inc-by-x: ;x
+ldf $inc-by-x-inner
+rtn
+$inc-by-x-inner: ;x
+ld 1 0
+ld 0 0
+add
+rtn
