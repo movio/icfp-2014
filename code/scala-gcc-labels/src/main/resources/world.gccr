@@ -118,7 +118,7 @@ ld 0 0
 car
 ld 0 1
 car
-cgt
+cgte
 tsel $max-by-car-first $max-by-car-second
 $max-by-car-first:
 ld 0 0
