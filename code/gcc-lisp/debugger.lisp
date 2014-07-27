@@ -10,15 +10,18 @@
   ;; 6 = ghost start
   (defun test-world ()
     (mklist
-      (mklist 0 0 0 0 0)
-      (mklist 0 0 2 0 0)
-      (mklist 0 4 5 6 0)
-      (mklist 0 0 0 0 0)))
+      (mklist 0 0 0 0 0 0 0)
+      (mklist 0 5 2 2 2 2 0)
+      (mklist 0 2 0 0 2 0 0)
+      (mklist 0 2 2 2 0 0 0)
+      (mklist 0 2 0 0 0 1 0)
+      (mklist 0 2 0 0 1 6 0)
+      (mklist 0 0 0 0 0 0 0)))
 
   (defun test-lman-state ()
     (mktuple
       0          ;; vitality
-      (cons 2 2) ;; position
+      (cons 1 1) ;; position
       2          ;; direction
       2          ;; remaining lives
       100))      ;; score
@@ -27,11 +30,11 @@
     (mktuple
       (mktuple
         0          ;; vitality
-        (cons 3 2) ;; position
+        (cons 5 5) ;; position
         3)))       ;; direction
 
   (defun test-fruit ()
-    100) ;; ticks remaining
+    0) ;; ticks remaining
 
   (defun test-game-state ()
     (mktuple

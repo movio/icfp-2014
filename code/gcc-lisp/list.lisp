@@ -33,10 +33,8 @@
   (defun concat (lst)
     (reverse
       (fold-left lst nil (lambda (acc next)
-                           (if (atom? next)
-                             (cons next acc)
-                             (fold-left next acc (lambda (acc next)
-                                                   (cons next acc))))))))
+                           (fold-left next acc (lambda (acc next)
+                                                 (cons next acc)))))))
 
   (defun mapcat (lst fun)
     (concat (map lst fun)))
@@ -44,6 +42,9 @@
   (defun length (lst)
     (fold-left lst 0 (lambda (acc next)
                        (+ acc 1))))
+
+  (defun zip-with-index (lst)
+    (zip lst (range (length lst))))
 
   (defun range (n)
     (range-iter n nil))
