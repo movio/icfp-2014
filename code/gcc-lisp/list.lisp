@@ -54,14 +54,12 @@
       ((lambda (n) (range-iter n (cons n out))) (- count 1))))
 
   (defun zip (a b)
-    (zip-iter a b nil))
+    (reverse (zip-iter a b nil)))
   (defun zip-iter (a b out)
-    (if (atom? a)
+    (if (or (atom? a) (atom? b))
       out
-      (if (atom? b)
-        out
-        (zip-iter
-          (cdr a)
-          (cdr b)
-          (cons (cons (car a) (car b)) out)))))
+      (zip-iter
+        (cdr a)
+        (cdr b)
+        (cons (cons (car a) (car b)) out))))
 )

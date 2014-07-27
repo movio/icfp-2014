@@ -7,7 +7,7 @@
   ;; entry point for each move
 
   (defun step (ai-state Q)
-    (cons 0 (old-ai Q)))
+    (dbg (zip-with-index (mklist 9 8 7 6 5))))
 
   ;; helper functions
 
@@ -20,7 +20,7 @@
       (get-paths-iter
         (mapcat paths (lambda (path)
                         (map
-                          (urdl (car path))                 ;; positions to consider
+                          (find-urdl (car path))                 ;; positions to consider
                           (lambda (pos)
                             (if (get-paths-filter pos path) ;; remove walls and last-pos
                               nil                           ;; gets removed by the concat (mapcat)
@@ -33,7 +33,7 @@
       (car path)
       (nth path 1))) ;; zero-indexed
 
-  (defun urdl (pos)
+  (defun find-urdl (pos)
     ((lambda (x y)
       (mklist
         (cons x (- y 1))
@@ -69,12 +69,12 @@
           (zip-with-index
             (map
               (map
-                (urdl (lman-pos Q))
+                (find-urdl (lman-pos Q))
                 (close-1-1 at-world (world Q)))
               (lambda (x)
-                (if (>= x 3) 1 x))))
+                (if (>= x 3) 1 x)))) ;; normalise world
           (lambda (v-dir)
-            (not (= (cdr v-dir) (nth (mklist 2 3 0 1) (lman-dir Q))))))
+            (not (= (cdr v-dir) (nth (mklist 2 3 0 1) (lman-dir Q)))))) ;; lookup table for opposite dir
         (cons 0 0)
         (lambda (max candidate)
           (if (>= (car candidate) (car max))
