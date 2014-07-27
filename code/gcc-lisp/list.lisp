@@ -9,6 +9,12 @@
                                    (= (car next) (cdr next)))))
       0))
 
+  (defun exists (lst pred)
+    (fold-left lst 0 (lambda (acc next)
+                       (if (= acc 1)
+                         1
+                         (pred next)))))
+
   (defun fold-left (lst acc fun)
     (if (atom? lst)
       acc

@@ -1,10 +1,12 @@
 ;; tuple functions
 
 (
-  (defun nth (lst n)
-    (if (= n 0)
-      (car lst)
-      (nth (cdr lst) (- n 1))))
+  (defun nth (tpl n)
+    (if (>= 0 n)
+      (if (atom? tpl)
+        tpl
+        (car tpl))
+      (nth (cdr tpl) (- n 1))))
 
   (defun teq (a b)
     (if (= (length a) (length b)) ;; optimisation: will be 1 less than actual length

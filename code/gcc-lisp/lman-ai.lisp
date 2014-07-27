@@ -2,36 +2,64 @@
 
 (
   ;; constants
-  (defun PATH_LENGTH () 1)
+  (defun PATH_LENGTH () 2)
+  (defun SCORES ()
+    (mklist
+      0      ;; wall
+      1      ;; empty
+      2      ;; pill
+      3      ;; poison
+      4      ;; fruit (if exists)
+      -1))   ;; ghost
 
   ;; entry point for each move
 
   (defun step (ai-state Q)
-    (dbg (zip-with-index (mklist 9 8 7 6 5))))
+    (dbg (get-paths-from (lman-pos Q) (gen-is-not-wall-at Q))))
+
+  ;; AI !
+
+;; THIS FUNCTION IS BROKEN, WON'T COMPILE
+;;  (defun at-world-scored (Q)
+;;    (lambda (pos)
+;;      (let ((ghost-poss (map (ghost-states Q) ghost-pos))
+;;            (value      (if (exists ghost-poss (lambda (p) (teq pos p)))
+;;                          5                            ;; override to ghost value if ghost
+;;                          (if (= 0 (fruit-state Q))
+;;                            1                          ;; override fruit to empty if not there
+;;                            (at-world (world Q) pos))) ;; otherwise find value in world
+;;            (score (nth (SCORES) val)))
+;;        score))))
+
+  (defun gen-is-not-wall-at (Q)
+    (let ((this-world (world Q))
+          (gen-fun    (close-1-1 at-world this-world)))
+      (lambda (pos)
+        (> (gen-fun pos) 0))))
 
   ;; helper functions
 
   ; returns [path]
-  (defun get-paths-from (pos)
-    (get-paths-iter (mklist (mklist pos)) (PATH_LENGTH)))
-  (defun get-paths-iter (paths depth)
+  (defun get-paths-from (pos is-not-wall)
+    (get-paths-iter (mklist (mklist pos)) is-not-wall (PATH_LENGTH)))
+  (defun get-paths-iter (paths is-not-wall depth)
     (if (= 0 depth)
       paths
       (get-paths-iter
         (mapcat paths (lambda (path)
                         (map
-                          (find-urdl (car path))                 ;; positions to consider
+                          (filter
+                            (find-urdl (car path))               ;; positions to consider
+                            (lambda (pos)
+                              (and
+                                (not (exists path
+                                       (lambda (old-pos)
+                                         (teq old-pos pos))))    ;; exclude spaces i've already been on
+                                (is-not-wall pos))))             ;; excluding walls
                           (lambda (pos)
-                            (if (get-paths-filter pos path) ;; remove walls and last-pos
-                              nil                           ;; gets removed by the concat (mapcat)
-                              (cons pos path))))))
+                            (cons pos path)))))                  ;; prepended to the existing path
+        is-not-wall
         (- depth 1))))
-  (defun get-paths-filter (pos path)
-    (teq pos (get-paths-last-pos path)))
-  (defun get-paths-last-pos (path)
-    (if (= 1 (length path))
-      (car path)
-      (nth path 1))) ;; zero-indexed
 
   (defun find-urdl (pos)
     ((lambda (x y)
@@ -47,6 +75,15 @@
     (nth (nth world (cdr pos)) (car pos)))
 
   ;; extractors from game-state
+
+  (defun fruit-state (Q)
+    (nth Q 3))
+
+  (defun ghost-pos (ghost-state)
+    (nth ghost-state 1))
+
+  (defun ghost-states (Q)
+    (nth Q 2))
 
   (defun lman-pos (Q)
     (nth (lman-state Q) 1))
