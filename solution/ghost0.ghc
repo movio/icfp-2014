@@ -9,44 +9,44 @@ mov f, b        ; Store ghost's y-ordinate in register F
 int 3           ; Get current ghost's index in register A
 int 6           ; Get current ghost's vitality
 
-jeq 12,h,1  ; skip x-ordinate if we already checked it ; jump to #checkY
-jlt 21,e,c  ; If ghost's x-ordinate is less than Lambda-Man's x-ordinate, move to the right or left ; jump to #gxLessLx
-jgt 29,e,c  ; If ghost's x-ordinate is greater than Lambda-Man's x-ordinate, move to the right or left ; jump to #gxGreaterLx
+jeq 12,h,1      ; Skip x-ordinate if we already checked it ; jump to #checkY
+jlt 21,e,c      ; If ghost's x-ordinate is less than Lambda-Man's x-ordinate, move to the right or left ; jump to #gxLessLx
+jgt 29,e,c      ; If ghost's x-ordinate is greater than Lambda-Man's x-ordinate, move to the right or left ; jump to #gxGreaterLx
 ;#checkY
-jlt 37,f,d  ; If ghost's y-ordinate is less than Lambda-Man's y-ordinate, move down or up ; jump to #gyLessLy
+jlt 37,f,d      ; If ghost's y-ordinate is less than Lambda-Man's y-ordinate, move down or up ; jump to #gyLessLy
 
 ; Get first direction based on position of Lambda-Man
 
 ;#gyGreaterLy
-mov h, 0        ; set flag that indicates we are changing y-ordinate
-jeq 18,a,1   ; jump to #gyGreaterLyFright
+mov h, 0        ; Set flag that indicates we are changing y-ordinate
+jeq 18,a,1      ; Jump to #gyGreaterLyFright
 mov c, 0        ; Move up if we are in standard mode
 dec f           ; Set new y-ordinate
-jeq 44,1,1   ; jump to #checkWall
+jeq 44,1,1      ; Jump to #checkWall
 
 ;#gyGreaterLyFright
 mov c, 2        ; Move down if we are in fright mode
 inc f           ; Set new y-ordinate
-jeq 44,1,1   ; jump to #checkWall
+jeq 44,1,1      ; Jump to #checkWall
 
 ;#gxLessLx
-mov h, 1        ; set flag that indicates we are changin x-ordinate
-jeq 26,a,1   ; jump to #gxLessLxFright
+mov h, 1        ; Set flag that indicates we are changin x-ordinate
+jeq 26,a,1      ; Jump to #gxLessLxFright
 mov c, 1        ; Move to the right if we are in standard mode
 inc e           ; Set new x-ordinate
-jeq 44,1,1   ; jump to #checkWall
+jeq 44,1,1      ; Jump to #checkWall
 
 ;#gxLessLxFright
 mov c, 3        ; Move to the left if we are in fright mode
 dec e           ; Set new x-ordinate
-jeq 44,1,1   ; jump to #checkWall
+jeq 44,1,1      ; Jump to #checkWall
 
 ;#gxGreaterLx
-mov h, 1        ; set flag that indicates we are changin x-ordinate
-jeq 34,a,1   ; jump to #gxGreaterLxFright
+mov h, 1        ; Set flag that indicates we are changin x-ordinate
+jeq 34,a,1      ; Jump to #gxGreaterLxFright
 mov c, 3        ; Move to the left if we are in standard mode
 dec e           ; Set new x-ordinate
-jeq 44,1,1   ; jump to #checkWall
+jeq 44,1,1      ; Jump to #checkWall
 
 ;#gxGreaterLxFright
 mov c, 1        ; Move to the right if we are in fright mode
@@ -54,11 +54,11 @@ inc e           ; Set new x-ordinate
 jeq 44,1,1   ; jump to #checkWall
 
 ;#gyLessLy
-mov h, 0        ; set flag that indicates we are changin y-ordinate
-jeq 42,a,1   ; jump to #gyLessLyFright
+mov h, 0        ; Set flag that indicates we are changin y-ordinate
+jeq 42,a,1      ; Jump to #gyLessLyFright
 mov c, 2        ; Move down if we are in standard mode
 inc f           ; Set new y-oridnate
-jeq 44,1,1   ; jump to #checkWall
+jeq 44,1,1      ; Jump to #checkWall
 
 ;#gyLessLyFright
 mov c, 0        ; Move up if we are in fright mode
@@ -70,7 +70,7 @@ dec f           ; Set new y-oridnate
 mov a, e        ; Set x-ordinate
 mov b, f        ; Set y-ordinate
 int 7           ; Get contents of new direction square
-jeq 55,a,0  ; If new square is a wall, don't go there and pick new direction ; jump to #lessTravelledDirection
+jeq 55,a,0      ; If new square is a wall, don't go there and pick new direction ; jump to #lessTravelledDirection
 
 ; Check if we would go back
 
@@ -78,35 +78,36 @@ int 3           ; Get current ghost's index
 int 6           ; Get current direction in register B
 mov d, c        ; Copy new direction to register D so we can compare it to current direction
 xor d, b        ; If directions are opposite the result of xor is 2
-jeq 55,d,2  ; Choose different direction if new direction is opposite of current direction ; jump to #lessTravelledDirection
+jeq 55,d,2      ; Choose different direction if new direction is opposite of current direction ; jump to #lessTravelledDirection
 
 mov a, c        ; Copy new direction to register A
-jeq 65,1,1   ; jump to #makeMove
+jeq 66,1,1      ; Jump to #makeMove
 
 ; Pick new direction based on least travelled direction
 
 ;#lessTravelledDirection
-jeq 0,h,1  ; try to change y-ordinate if x doesn't work ; jump to #start
+jeq 0,h,1       ; Try to change y-ordinate if x doesn't work ; jump to #start
 mov e, 255      ; E is the min value
 mov f, 0        ; F is the corresponding direction
 mov g, 255      ; G is the candidate direction for the new min
 
 ;#newDirection
 inc g           ; Pick new direction
-jgt 63,[g],e  ; Jump if count of direction G is above best so far ; jump to #allDirections
+jgt 63,[g],e    ; Jump if count of direction G is above best so far ; jump to #allDirections
 
 mov e, [g]      ; Save new min
 mov f, g        ; Save direction
 ;#allDirections
-jlt 59,g,3  ; Jump target. Loop back if we have not tried all 4 directions ; jump to #newDirection
+jlt 59,g,3      ; Jump target. Loop back if we have not tried all 4 directions ; jump to #newDirection
 
 mov a, f        ; Actually set desired direction
+inc [f]         ; Increment count for desired direction
 
 ; Set new direction and update direction counter
 ;#makeMove
-mov h, 0        ; reset x/y flag
+mov h, 0        ; Reset x/y flag
 int 0
 int 3           ; Get our ghost index in A
 int 6           ; Get out current direction in B
-inc [b]         ; Increment corresponding count
+inc [b]         ; Increment count for actual direction
 hlt             ; Stop
