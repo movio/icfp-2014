@@ -1,37 +1,62 @@
 # Team Movio
 
-First off, thank you for creating this wonderful challenge. It's been a really
-fun and exciting day for us!
+Again, thank you for creating this challenge. It's definitely been a long
+weekend!
 
-We spent most of the day trying to make higher level functions for GCC (see
-Helper Functions below). We got started on a Lisp compiler but it's not
-completed so we have in place of that a simple extension to GCC that allows
-labels which compiles down to absolute addresses. This was implemented in Scala;
-see below for instructions to run.
+After day one we got a compiler for a custom lisp language working which we
+called MLISP. Slowly we ironed out the bugs so we could start writing our AI at
+a much higher level.
 
-The algorithm is pretty straightforward - look at the 4 squares around lambdaman
-and find the one with the highest worth and go in that direction. The naive
-approach of looking at all 4 squares every time meant that lambdaman could get
-stuck when more than one direction is equal in worth, especially in corners:
+## Code
 
-                                  +-+-+
-                                     \|
-                                  +-+ +
-                                    | |
-                                    + +
+While we built several distinct tools during the weekend we used different tools
+for the lightning and the full rounds.
 
-We got around that by disallowing going back the way you came, but this can
-prove fatal if ghosts are coming your way. We didn't get far enough to take
-ghosts into account.
+  * Lightning round
+    * scala-gcc-labels: labels for raw GCC
+    * ghost-compiler:   labels and variables for GHC
+  * Full round
+    * gcc:              MLISP compiler for GCC
+    * ghost-compiler:   labels, variables and helper functions for GHC
+    * gcc-lisp:         sources for lambdaman
 
-## Solution
+Each tool has a dedicated README.md within its directory.
 
-Our solution is generated from the "world.gccr" file. It is located in
-code/scala-gcc-labels/src/main/resources.
+## Solution - Lambdaman
 
-## Ghosts
+Our final solution evaluates all paths up to a predetermined PATH_LENGTH
+distance by scoring them based on what is on each grid position. Grids closer to
+lambdaman are weighted more heavily for this evaluation.
 
-We wrote three different ghost AIs: Jai, Kai, Trai.
+To try to prevent getting stuck, we use the direction of the first ghost as a
+pseudo-random number generator, so to speak. This happens when multiple
+directions evaluate to the same score, at which point we pick the first
+available direction starting from the direction of the first ghost and rotating
+clockwise.
+
+Whereas we wrote our lightning solution mostly by hand, for the full round we
+used our MLISP compiler. The sources are in code/gcc-lisp:
+
+  * Core files:
+    * util.lisp:      basic utility functions
+    * list.lisp:      a list library modelled on Scala
+    * tuple.lisp:     a small set of utility functions for tuples
+    * lman-ai.lisp:   the main AI logic
+
+  * Entry points:
+    * debugger.lisp:  compile with this to execute in the reference Lambdaman
+                      CPU emulator with a test game state
+    * simulator.lisp: compile with this to execute in the reference game
+                      simulator
+
+See code/gcc/README.md for a more detailed look at our MLISP compiler.
+
+## Solution - Ghosts
+
+We wrote three different ghost AIs: Jai, Kai, Trai. To help with addressing in
+the assembly we wrote a simple label implementation.
+
+See code/ghost-compiler/README.md for more detailed instructions.
 
 ### Jai (ghost0 AI)
 
@@ -49,30 +74,3 @@ direction. In fright mode he behaves the same as Jai.
 Trai is a bit biased towards Lambda-Man. He changes his mind every 5 steps and
 alternates between picking a direction randomly or following Lambda-Man. In
 fright mode he behaves the same as Jai and Kai.
-
-
-## Compiling GCC/labels
-
-The "compiler" is pretty straightforward. It's in the code/scala-gcc-labels
-directory. The project can be built with SBT. Navigate to the root directory of
-the source (i.e., code/scala-gcc-labels) and run these commands:
-
-  sbt compile
-  sbt test
-
-It takes a single .gccr file as the argument and prints the .gcc output to
-stdout. For example,
-
-  sbt "run src/main/resources/world.gccr"
-
-Note that the "run" command and the path to the file should be passed to sbt as
-one parameter. Alternative, you can load SBT and type in the sbt prompt:
-
-  sbt> run src/main/resources/world.gccr
-
-## Helper Functions
-
-A set of common utility functions that operate on lists were implemented to make
-things easier for us to write the AI by hand. You can find these in
-code/scala-gcc-labels/src/main/resources/list.gccr. We started with `fold-left`
-and went on from there.
