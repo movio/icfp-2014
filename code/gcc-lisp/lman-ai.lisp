@@ -104,7 +104,6 @@
                                                             ;; TODO: take vitality into account
             (if (or
                   (and (= world-value 4) (= 0 fruit-state)) ;; if fruit but not exist
-                                                            ;; TODO: take ticks left into account
                   (>= world-value 5))                       ;; or starting locations
               (nth (SCORES) 1)                              ;; treat as empty
               (nth (SCORES) world-value)))))))              ;; else use value directly
