@@ -38,10 +38,10 @@ Whereas we wrote our lightning solution mostly by hand, for the full round we
 used our MLISP compiler. The sources are in code/gcc-lisp:
 
   * Core files:
+    * lman-ai.lisp:   the main AI logic
     * util.lisp:      basic utility functions
     * list.lisp:      a list library modelled on Scala
     * tuple.lisp:     a small set of utility functions for tuples
-    * lman-ai.lisp:   the main AI logic
 
   * Entry points:
     * debugger.lisp:  compile with this to execute in the reference Lambdaman
