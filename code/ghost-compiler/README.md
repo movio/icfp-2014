@@ -7,8 +7,8 @@ your ghost code and other helper functions.
 
 To build the ghost-compiler, run the following:
 
-   sbt
-   > package
+    sbt
+    > package
 
 This will first install missing libraries and then compile the project.
 
