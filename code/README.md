@@ -31,9 +31,25 @@ code/scala-gcc-labels/src/main/resources.
 
 ## Ghosts
 
-We tested our code against a custom ghost AI that one of us wrote. Those ghosts
-home in on lambdaman pretty fast. The ghost AI is in the code/ghost-ai
-directory.
+We wrote three different ghost AIs: Jai, Kai, Trai.
+
+### Jai (ghost0 AI)
+
+When not in fright mode, Jai is trying to follow Lambda-Man by getting closer
+to him on either the x-ordinate or the y-ordinate. When in fright mode, he is
+trying to distance himself from Lambda-Man so he won't get eaten.
+
+### Kai (ghost1 AI)
+
+Kai is not very interested in Lambda-Man and just tries to randomly pick a valid
+direction. In fright mode he behaves the same as Jai.
+
+### Trai (ghost2 AI)
+
+Trai is a bit biased towards Lambda-Man. He changes his mind every 5 steps and
+alternates between picking a direction randomly or following Lambda-Man. In
+fright mode he behaves the same as Jai and Kai.
+
 
 ## Compiling GCC/labels
 
