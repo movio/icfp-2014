@@ -33,7 +33,7 @@
         (cons 5 5) ;; position
         3)         ;; direction
       (mktuple
-        0          ;; vitality
+        1          ;; vitality
         (cons 1 5) ;; position
         0)))       ;; direction
 

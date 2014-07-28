@@ -2,6 +2,7 @@
 
 (
   ;; constants
+  (defun BAD_PATH () -2000000000)
   (defun PATH_LENGTH () 6)
   (defun SCORES ()
     (mklist
@@ -25,8 +26,15 @@
           (scored-paths    (map paths
                                 (lambda (path)
                                   (cons
-                                    (fold-left path 0 (lambda (total next-pos)
-                                                        (+ total (score-at-pos next-pos))))
+                                    (fold-left (zip-with-index path) 0
+                                               (lambda (total pos-dist)
+                                                 (let ((next-pos   (car pos-dist))
+                                                       (dist       (cdr pos-dist))
+                                                       (raw-score  (score-at-pos next-pos))
+                                                       (dist-score (if (= 0 raw-score)
+                                                                     0
+                                                                     (/ (* 10000 raw-score) (pow 2 dist)))))
+                                                   (+ total dist-score))))
                                     path))))
           (urdl-score-sum  (map urdl
                                 (lambda (dir-pos)
@@ -42,49 +50,56 @@
                                    (let ((sum   (car sum-count))
                                          (count (cdr sum-count)))
                                      (if (= 0 count)
-                                       -1                  ;; mark empty directions with sentinel value
+                                       (BAD_PATH)                  ;; mark empty directions with sentinel value
                                        (/ sum count))))))
-          (best-dir        (cdr
-                             (fold-left (zip-with-index urdl-score-avg) (cons 0 -1)
-                                        (lambda (max score-dir)
-                                          (if (> (car score-dir) (car max))
-                                            score-dir
-                                            max)))))
-          (final-dir       (if (> best-dir -1)
-                             best-dir                                ;; if we found a dir use it
-                             (let ((next-dirs (map (range 4)         ;; else use next clockwise dir from cur dir
-                                                   (lambda (x)
-                                                     (let ((next-x (+ x lman-dir)))
-                                                       (if (>= next-x 4)
-                                                         (- next-x 4)
-                                                         next-x))))))
-                                 (fold-left next-dirs -1
-                                            (lambda (found-dir next-dir)
-                                              (if (> found-dir -1)
-                                                found-dir
-                                                (if (> (nth urdl-score-avg next-dir) -1)
-                                                  next-dir
-                                                  -1)))))))
+          (best-score-dirs (fold-left (zip-with-index urdl-score-avg) (mklist (cons (BAD_PATH) -1))
+                                      (lambda (max score-dir)
+                                        (let ((score     (car score-dir))
+                                              (max-score (car (car max)))) ;; car of head of list
+                                          (if (= score max-score)
+                                            (cons score-dir max)
+                                            (if (> score max-score)
+                                              (mklist score-dir)
+                                              max))))))
+          (best-dirs       (map best-score-dirs (lambda (score-dir)
+                                                  (cdr score-dir))))
+          (chosen-dir      (let ((dirs (map (range 4)
+                                            (lambda (x) (mod (+ x lman-dir) 4))))) ;; enum dirs from cur dir clockwise
+                             (fold-left dirs -1 (lambda (chosen-dir next-dir)
+                                                  (if (> chosen-dir -1)
+                                                    chosen-dir
+                                                    (if (exists best-dirs (lambda (dir) (= next-dir dir)))
+                                                      next-dir
+                                                      -1))))))
           )
-      (dbg scored-paths)
-      (dbg urdl-score-avg)
-      (dbg best-dir)
-      (dbg final-dir)
-      (cons 0 final-dir)
+      ;;(dbg scored-paths)
+      ;;(dbg urdl-score-avg)
+      ;;(dbg best-score-dirs)
+      ;;(dbg chosen-dir)
+      (cons 0 chosen-dir)
       ))
 
   ;; gets a function to score a position based on the current game state
   (defun get-score-at-pos (Q)
     (let ((at-pos          (close-1-1 at-world (get-world Q)))
-          (ghost-poss      (map (get-ghost-states Q) get-ghost-pos))
-          (is-ghost-at-pos (lambda (pos)
-                             (exists ghost-poss (lambda (ghost-pos)
-                                                  (teq pos ghost-pos)))))
+          (ghost-states    (get-ghost-states Q))
+          (ghost-at-pos    (lambda (pos)
+                             (fold-left (zip-with-index ghost-states) -1
+                                        (lambda (found next-ghost-state)
+                                          (if (> found -1)
+                                            found
+                                            (let ((ghost-state (car next-ghost-state))
+                                                  (index       (cdr next-ghost-state)))
+                                              (if (teq pos (get-ghost-pos ghost-state))
+                                                index
+                                                -1)))))))
           (fruit-state     (get-fruit-state Q)))
       (lambda (pos)
-        (let ((world-value (at-pos pos)))                   ;; world value at position
-          (if (is-ghost-at-pos pos)
-            (nth (SCORES) 5)                                ;; if ghost return ghost score
+        (let ((world-value (at-pos pos))                    ;; world value at position
+              (ghost-index (ghost-at-pos pos)))             ;; ghost at position else -1
+          (if (> ghost-index -1)
+            (let ((ghost-vit (get-ghost-vit (nth ghost-states ghost-index))))
+              (nth (SCORES) (+ 5 ghost-vit)))               ;; if ghost return ghost score based on vit
                                                             ;; TODO: take vitality into account
             (if (or
                   (and (= world-value 4) (= 0 fruit-state)) ;; if fruit but not exist
@@ -142,6 +157,9 @@
 
   (defun get-ghost-pos (ghost-state)
     (nth ghost-state 1))
+
+  (defun get-ghost-vit (ghost-state)
+    (nth ghost-state 0))
 
   (defun get-ghost-states (Q)
     (nth Q 2))

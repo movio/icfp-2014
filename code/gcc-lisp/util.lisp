@@ -15,4 +15,18 @@
 
   (defun or (x y)
     (> (+ (= 0 (= 0 x)) (= 0 (= 0 y))) 0)) ;; double inline not for normalisation
+
+  (defun mod (n m)
+    (if (>= n m)
+      (mod (- n m) m)
+      (if (>= n 0)
+        n
+        (mod (+ n m) m))))
+
+  (defun pow (b e)
+    (pow-iter b e 1))
+  (defun pow-iter (b times-left out)
+    (if (>= 0 times-left)
+      out
+      (pow-iter b (- times-left 1) (* out b))))
 )
