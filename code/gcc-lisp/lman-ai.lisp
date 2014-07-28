@@ -2,7 +2,7 @@
 
 (
   ;; constants
-  (defun PATH_LENGTH () 3)
+  (defun PATH_LENGTH () 4)
   (defun SCORES ()
     (mklist
       0      ;; wall
@@ -19,8 +19,9 @@
           (paths           ((get-paths-from Q) lman-pos))
           (score-at-pos    (get-score-at-pos Q)))
       (dbg (map paths (lambda (path)
-                        (map path (lambda (pos)
-                                    (score-at-pos pos))))))))
+                        (let ((score (fold-left path 0 (lambda (total-score next-pos)
+                                                         (+ total-score (score-at-pos next-pos))))))
+                          (cons score path)))))))
 
   ;; AI !
 
@@ -32,16 +33,17 @@
                              (exists ghost-poss (lambda (ghost-pos)
                                                   (teq pos ghost-pos)))))
           (fruit-state     (get-fruit-state Q)))
-      (close-4-1 get-score-at-pos-internal at-pos ghost-poss is-ghost-at-pos fruit-state)))
-  (defun get-score-at-pos-internal (at-pos ghost-poss is-ghost-at-pos fruit-state pos)
-    (let ((world-value (at-pos pos)))
-      (if (is-ghost-at-pos pos)
-        (nth (SCORES) 5)
-        (if (or
-              (and (= world-value 4) (= 0 fruit-state))
-              (>= world-value 5))
-          (nth (SCORES) 1)
-          (nth (SCORES) world-value)))))
+      (lambda (pos)
+        (let ((world-value (at-pos pos)))                   ;; world value at position
+          (if (is-ghost-at-pos pos)
+            (nth (SCORES) 5)                                ;; if ghost return ghost score
+                                                            ;; TODO: take vitality into account
+            (if (or
+                  (and (= world-value 4) (= 0 fruit-state)) ;; if fruit but not exist
+                                                            ;; TODO: take ticks left into account
+                  (>= world-value 5))                       ;; or starting locations
+              (nth (SCORES) 1)                              ;; treat as empty
+              (nth (SCORES) world-value)))))))              ;; else use value directly
 
   ;; returns all paths up to length PATH_LENGTH from the given position
   (defun get-paths-from (Q)

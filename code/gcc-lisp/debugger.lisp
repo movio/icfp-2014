@@ -11,11 +11,11 @@
   (defun test-world ()
     (mklist
       (mklist 0 0 0 0 0 0 0)
-      (mklist 0 5 2 2 2 2 0)
+      (mklist 0 5 1 2 2 2 0)
       (mklist 0 2 0 0 2 0 0)
-      (mklist 0 2 2 2 0 0 0)
+      (mklist 0 2 3 4 0 0 0)
       (mklist 0 2 0 0 0 1 0)
-      (mklist 0 2 0 0 1 6 0)
+      (mklist 0 6 0 0 1 6 0)
       (mklist 0 0 0 0 0 0 0)))
 
   (defun test-lman-state ()
@@ -31,10 +31,14 @@
       (mktuple
         0          ;; vitality
         (cons 5 5) ;; position
-        3)))       ;; direction
+        3)         ;; direction
+      (mktuple
+        0          ;; vitality
+        (cons 1 5) ;; position
+        0)))       ;; direction
 
   (defun test-fruit ()
-    0) ;; ticks remaining
+    100) ;; ticks remaining
 
   (defun test-game-state ()
     (mktuple
