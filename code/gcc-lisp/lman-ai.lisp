@@ -2,7 +2,7 @@
 
 (
   ;; constants
-  (defun PATH_LENGTH () 5)
+  (defun PATH_LENGTH () 6)
   (defun SCORES ()
     (mklist
       0       ;; wall
@@ -18,6 +18,7 @@
 
   (defun step (ai-state Q)
     (let ((lman-pos        (get-lman-pos Q))
+          (lman-dir        (get-lman-dir Q))
           (urdl            (find-urdl lman-pos))
           (paths           ((get-paths-from Q) lman-pos))
           (score-at-pos    (get-score-at-pos Q))
@@ -27,20 +28,50 @@
                                     (fold-left path 0 (lambda (total next-pos)
                                                         (+ total (score-at-pos next-pos))))
                                     path))))
-          (best-path       (fold-left scored-paths
-                                      (cons -10000 0)
-                                      (lambda (max next)
-                                        (if (> (car next) (car max))
-                                          next
-                                          max))))
-          (best-path-pos   (car (cdr best-path)))
-          (best-path-dir   (first-index-of urdl (lambda (urdl-pos) (teq urdl-pos best-path-pos)))))
-      ;;(dbg scored-paths)
-      ;;(dbg best-path)
-      ;;(dbg best-path-dir)
-      (cons 0 best-path-dir)))
-
-  ;; AI !
+          (urdl-score-sum  (map urdl
+                                (lambda (dir-pos)
+                                  (fold-left scored-paths (cons 0 0)
+                                             (lambda (total scored-path)
+                                               (let ((score (car total))
+                                                     (count (cdr total)))
+                                                 (if (teq dir-pos (car (cdr scored-path))) ;; if this path starts in this dir
+                                                   (cons (+ score (car scored-path)) (+ count 1))
+                                                   total)))))))
+          (urdl-score-avg  (map urdl-score-sum
+                                 (lambda (sum-count)
+                                   (let ((sum   (car sum-count))
+                                         (count (cdr sum-count)))
+                                     (if (= 0 count)
+                                       -1                  ;; mark empty directions with sentinel value
+                                       (/ sum count))))))
+          (best-dir        (cdr
+                             (fold-left (zip-with-index urdl-score-avg) (cons 0 -1)
+                                        (lambda (max score-dir)
+                                          (if (> (car score-dir) (car max))
+                                            score-dir
+                                            max)))))
+          (final-dir       (if (> best-dir -1)
+                             best-dir                                ;; if we found a dir use it
+                             (let ((next-dirs (map (range 4)         ;; else use next clockwise dir from cur dir
+                                                   (lambda (x)
+                                                     (let ((next-x (+ x lman-dir)))
+                                                       (if (>= next-x 4)
+                                                         (- next-x 4)
+                                                         next-x))))))
+                                 (fold-left next-dirs -1
+                                            (lambda (found-dir next-dir)
+                                              (if (> found-dir -1)
+                                                found-dir
+                                                (if (> (nth urdl-score-avg next-dir) -1)
+                                                  next-dir
+                                                  -1)))))))
+          )
+      (dbg scored-paths)
+      (dbg urdl-score-avg)
+      (dbg best-dir)
+      (dbg final-dir)
+      (cons 0 final-dir)
+      ))
 
   ;; gets a function to score a position based on the current game state
   (defun get-score-at-pos (Q)
