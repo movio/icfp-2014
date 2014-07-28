@@ -20,6 +20,7 @@
   (defun step (ai-state Q)
     (let ((lman-pos        (get-lman-pos Q))
           (lman-dir        (get-lman-dir Q))
+          (ghost1-dir      (get-ghost-dir (car (get-ghost-states Q))))
           (urdl            (find-urdl lman-pos))
           (paths           ((get-paths-from Q) lman-pos))
           (score-at-pos    (get-score-at-pos Q))
@@ -64,7 +65,7 @@
           (best-dirs       (map best-score-dirs (lambda (score-dir)
                                                   (cdr score-dir))))
           (chosen-dir      (let ((dirs (map (range 4)
-                                            (lambda (x) (mod (+ x lman-dir) 4))))) ;; enum dirs from cur dir clockwise
+                                            (lambda (x) (mod (+ x ghost1-dir) 4))))) ;; enum dirs from cur ghost1 dir cw
                              (fold-left dirs -1 (lambda (chosen-dir next-dir)
                                                   (if (> chosen-dir -1)
                                                     chosen-dir
@@ -154,6 +155,9 @@
 
   (defun get-fruit-state (Q)
     (nth Q 3))
+
+  (defun get-ghost-dir (ghost-state)
+    (nth ghost-state 2))
 
   (defun get-ghost-pos (ghost-state)
     (nth ghost-state 1))
