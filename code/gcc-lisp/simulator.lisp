@@ -2,5 +2,5 @@
 
 (
   (defun main (game-state ghost-prgs)
-    (cons 0 step))
+    (cons nil step))
 )

@@ -3,7 +3,8 @@
 (
   ;; constants
   (defun BAD_PATH () -2000000000)
-  (defun PATH_LENGTH () 6)
+  (defun PATH_LENGTH () 5)
+  (defun SIDE_PATH_THRESHOLD () 3)
   (defun SCORES ()
     (mklist
       0       ;; wall
@@ -17,12 +18,21 @@
 
   ;; entry point for each move
 
-  (defun step (ai-state Q)
+
+  (defun step (cur-pill-path Q)
     (let ((lman-pos        (get-lman-pos Q))
           (lman-dir        (get-lman-dir Q))
           (ghost1-dir      (get-ghost-dir (car (get-ghost-states Q))))
           (urdl            (find-urdl lman-pos))
           (paths           ((get-paths-from Q) lman-pos))
+          (at-pos          (close-1-1 at-world (get-world Q)))
+          (pill-path       (if (atom? cur-pill-path)
+                             (get-pill-path paths Q)
+                             cur-pill-path))
+          (pref-dir        (if (atom? pill-path)
+                             -1
+                             (first-index-of urdl (lambda (urdl-pos)
+                                                    (teq urdl-pos (car pill-path))))))
           (score-at-pos    (get-score-at-pos Q))
           (scored-paths    (map paths
                                 (lambda (path)
@@ -47,21 +57,27 @@
                                                    (cons (+ score (car scored-path)) (+ count 1))
                                                    total)))))))
           (urdl-score-avg  (map urdl-score-sum
-                                 (lambda (sum-count)
-                                   (let ((sum   (car sum-count))
-                                         (count (cdr sum-count)))
-                                     (if (= 0 count)
-                                       (BAD_PATH)                  ;; mark empty directions with sentinel value
-                                       (/ sum count))))))
-          (best-score-dirs (fold-left (zip-with-index urdl-score-avg) (mklist (cons (BAD_PATH) -1))
-                                      (lambda (max score-dir)
-                                        (let ((score     (car score-dir))
-                                              (max-score (car (car max)))) ;; car of head of list
-                                          (if (= score max-score)
-                                            (cons score-dir max)
-                                            (if (> score max-score)
-                                              (mklist score-dir)
-                                              max))))))
+                                (lambda (sum-count)
+                                  (let ((sum   (car sum-count))
+                                        (count (cdr sum-count)))
+                                    (if (= 0 count)
+                                      (BAD_PATH)           ;; mark empty paths with sentinel
+                                      (/ sum count))))))
+          (can-pill-path   (if (> pref-dir -1)                          ;; if we have a pill path
+                             (> (car (nth urdl-score-avg pref-dir)) 0) ;; and score in that dir is positive
+                             0))
+          (best-score-dirs (if can-pill-path
+                             (mklist (cons (nth urdl-score-avg pref-dir) pref-dir))  ;; pick the detour direction
+                                                                                     ;; else look for best score
+                             (fold-left (zip-with-index urdl-score-avg) (mklist (cons (BAD_PATH) -1))
+                                        (lambda (max score-dir)
+                                          (let ((score     (car score-dir))
+                                                (max-score (car (car max)))) ;; car of head of list
+                                            (if (= score max-score)
+                                              (cons score-dir max)
+                                              (if (> score max-score)
+                                                (mklist score-dir)
+                                                max)))))))
           (best-dirs       (map best-score-dirs (lambda (score-dir)
                                                   (cdr score-dir))))
           (chosen-dir      (let ((dirs (map (range 4)
@@ -76,8 +92,13 @@
       ;;(dbg scored-paths)
       ;;(dbg urdl-score-avg)
       ;;(dbg best-score-dirs)
-      ;;(dbg chosen-dir)
-      (cons 0 chosen-dir)
+      (cons
+        (if (atom? pill-path)
+          nil                  ;; if no pill path then nothing
+          (if can-pill-path
+            (cdr pill-path)    ;; if taking pop one off the pill path
+            nil))              ;; if is but not taking then reset
+        chosen-dir)
       ))
 
   ;; gets a function to score a position based on the current game state
@@ -101,7 +122,6 @@
           (if (> ghost-index -1)
             (let ((ghost-vit (get-ghost-vit (nth ghost-states ghost-index))))
               (nth (SCORES) (+ 5 ghost-vit)))               ;; if ghost return ghost score based on vit
-                                                            ;; TODO: take vitality into account
             (if (or
                   (and (= world-value 4) (= 0 fruit-state)) ;; if fruit but not exist
                   (>= world-value 5))                       ;; or starting locations
@@ -136,6 +156,38 @@
                                 (cons pos path))))))) ;; otherwise prepend each spot to the existing path
         is-not-wall
         (- depth 1))))
+
+  ;; get detours with small number of pills
+  (defun get-pill-path (paths Q)
+    (let ((at-pos          (close-1-1 at-world (get-world Q)))
+          (pill-paths      (fold-left paths nil
+                                      (lambda (out-paths path)
+                                        (let ((pill-path- (fold-left path (cons nil 1) ;; (out, continue)
+                                                                     (lambda (out-cont next)
+                                                                       (if (cdr out-cont)
+                                                                         (if (= 1 (at-pos next)) ;; if empty
+                                                                           (cons (car out-cont) 0)
+                                                                           (cons (cons next (car out-cont)) 1))
+                                                                         out-cont))))
+                                              (pill-path  (car pill-path-)))
+                                          (if (or
+                                                (atom? pill-path)
+                                                (> (length pill-path) (SIDE_PATH_THRESHOLD)))
+                                            out-paths  ;; if not a pill path or too long
+                                            (cons pill-path out-paths))))))
+          (short-pill-path (car (fold-left pill-paths (cons nil 0)
+                                           (lambda (short-len next)
+                                             (let ((len-next (length next)))
+                                               (if (atom? (car short-len))
+                                                 (cons next len-next)
+                                                 (if (> (cdr short-len) len-next)
+                                                   (cons next len-next)
+                                                   short-len)))))))
+          (rev-short       (reverse short-pill-path)))
+      (if (atom? rev-short)
+        nil
+        (fold-left rev-short (cdr rev-short) (lambda (acc next)
+                                               (cons next acc))))))
 
   (defun find-urdl (pos)
     ((lambda (x y)
