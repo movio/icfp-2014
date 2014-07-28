@@ -2,41 +2,30 @@
 
 (
   ;; constants
-  (defun PATH_LENGTH () 2)
+  (defun PATH_LENGTH () 3)
   (defun SCORES ()
     (mklist
       0      ;; wall
       1      ;; empty
       2      ;; pill
-      3      ;; poison
+      3      ;; power pill
       4      ;; fruit (if exists)
       -1))   ;; ghost
 
   ;; entry point for each move
 
   (defun step (ai-state Q)
-    (let ((world          (get-world Q))
-          (lman-pos       (get-lman-pos Q))
-          (at-pos         (close-1-1 at-world world)))
-      (dbg (get-paths-from lman-pos (lambda (pos) (> (at-pos pos) 0))))))
+    (let ((lman-pos       (get-lman-pos Q)))
+      (dbg ((get-paths-from Q) lman-pos))))
 
   ;; AI !
 
-;; THIS FUNCTION IS BROKEN, WON'T COMPILE - probably mismatched parens
-;;  (defun at-world-scored (Q)
-;;    (lambda (pos)
-;;      (let ((ghost-poss (map (ghost-states Q) ghost-pos))
-;;            (value      (if (exists ghost-poss (lambda (p) (teq pos p)))
-;;                          5                            ;; override to ghost value if ghost
-;;                          (if (= 0 (fruit-state Q))
-;;                            1                          ;; override fruit to empty if not there
-;;                            (at-world (world Q) pos))) ;; otherwise find value in world
-;;            (score (nth (SCORES) val)))
-;;        score))))
-
   ;; returns all paths up to length PATH_LENGTH from the given position
-  (defun get-paths-from (pos is-not-wall)
-    (get-paths-iter (mklist (mklist pos)) is-not-wall (PATH_LENGTH)))
+  (defun get-paths-from (Q)
+    (let ((at-pos (close-1-1 at-world (get-world Q)))
+          (is-not-wall-at-pos (lambda (pos) (> (at-pos pos) 0))))
+      (lambda (pos)
+        (get-paths-iter (mklist (mklist pos)) is-not-wall-at-pos (PATH_LENGTH)))))
   (defun get-paths-iter (paths is-not-wall depth)
     (if (= 0 depth)
       (map paths (lambda (path)           ;; if done
