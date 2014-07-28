@@ -6,23 +6,46 @@
   (defun SCORES ()
     (mklist
       0      ;; wall
-      1      ;; empty
-      2      ;; pill
-      3      ;; power pill
-      4      ;; fruit (if exists)
-      -1))   ;; ghost
+      10      ;; empty
+      20      ;; pill
+      30      ;; power pill
+      40      ;; fruit (if exists)
+      -10))   ;; ghost
 
   ;; entry point for each move
 
   (defun step (ai-state Q)
-    (let ((lman-pos       (get-lman-pos Q)))
-      (dbg ((get-paths-from Q) lman-pos))))
+    (let ((lman-pos        (get-lman-pos Q))
+          (paths           ((get-paths-from Q) lman-pos))
+          (score-at-pos    (get-score-at-pos Q)))
+      (dbg (map paths (lambda (path)
+                        (map path (lambda (pos)
+                                    (score-at-pos pos))))))))
 
   ;; AI !
 
+  ;; gets a function to score a position based on the current game state
+  (defun get-score-at-pos (Q)
+    (let ((at-pos          (close-1-1 at-world (get-world Q)))
+          (ghost-poss      (map (get-ghost-states Q) get-ghost-pos))
+          (is-ghost-at-pos (lambda (pos)
+                             (exists ghost-poss (lambda (ghost-pos)
+                                                  (teq pos ghost-pos)))))
+          (fruit-state     (get-fruit-state Q)))
+      (close-4-1 get-score-at-pos-internal at-pos ghost-poss is-ghost-at-pos fruit-state)))
+  (defun get-score-at-pos-internal (at-pos ghost-poss is-ghost-at-pos fruit-state pos)
+    (let ((world-value (at-pos pos)))
+      (if (is-ghost-at-pos pos)
+        (nth (SCORES) 5)
+        (if (or
+              (and (= world-value 4) (= 0 fruit-state))
+              (>= world-value 5))
+          (nth (SCORES) 1)
+          (nth (SCORES) world-value)))))
+
   ;; returns all paths up to length PATH_LENGTH from the given position
   (defun get-paths-from (Q)
-    (let ((at-pos (close-1-1 at-world (get-world Q)))
+    (let ((at-pos             (close-1-1 at-world (get-world Q)))
           (is-not-wall-at-pos (lambda (pos) (> (at-pos pos) 0))))
       (lambda (pos)
         (get-paths-iter (mklist (mklist pos)) is-not-wall-at-pos (PATH_LENGTH)))))

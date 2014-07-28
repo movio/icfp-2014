@@ -4,6 +4,9 @@
   (defun close-1-1 (fun var1)
     (lambda (var2) (fun var1 var2)))
 
+  (defun close-4-1 (fun var1 var2 var3 var4)
+    (lambda (var5) (fun var1 var2 var3 var4 var5)))
+
   (defun not (x)
     (= 0 x))
 

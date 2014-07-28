@@ -27,7 +27,7 @@
       100))      ;; score
 
   (defun test-ghosts-state ()
-    (mktuple
+    (mklist
       (mktuple
         0          ;; vitality
         (cons 5 5) ;; position
