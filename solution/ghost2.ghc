@@ -1,0 +1,112 @@
+; ghost 2 alternates between moving randomly and moving towards lambda-man
+; tries to get away from lambda-man if we are in fright mode
+;
+; register e -> flag for x or y
+; register g -> new direction
+; register h -> new direction retries
+
+mov h, 0                ; reset counter for direction retries
+
+;#newDirection
+inc h
+mov d, 0                ; reset back direction flag
+jlt 5,g,3               ; jump to #increaseDirection
+mov g, 255              ; reset direction
+
+;#increaseDirection
+inc g
+int 3                   ; get ghost index
+int 6                   ; get vitality in A
+jeq 27,a,1              ; jump to #frightMode
+jeq 10,1,1              ; jump to #checkMode
+
+;#checkMode
+int 3                   ; get ghost index
+mov f, [a]              ; move ghost step count into F
+sub f, a                ; substract ghost index from step count
+div f, 5
+and f, 1                ; check if result is even or odd
+jeq 37,f,1              ; don't chase if result is odd ; jump to #noChaseMode
+
+;#chaseMode
+jgt 37,h,2              ; try random direction if moving closer not possible ; jump to #noChaseMode
+int 1                   ; get lambda-man position
+mov c, a                ; move lambda-man x-ordinate into C
+mov d, b                ; move lambda-man y-ordinate into D
+int 3                   ; get ghost index
+int 5                   ; get ghost position
+jeq 25,e,1              ; try y if already tried x ; jump to #checkY
+
+;#checkX
+jlt 47,a,c              ; jump to #right
+jgt 55,a,c              ; jump to #left
+
+;#checkY
+jlt 51,b,d              ; jump to #down
+jgt 43,b,d              ; jump to #up
+
+;#frightMode
+jgt 37,h,4              ; try random direction if moving away not possible ; jump to #noChaseMode
+int 1                   ; get lambda-man position
+mov c, a                ; move lambda-man x-ordinate into C
+mov d, b                ; move lambda-man y-ordinate into D
+int 3                   ; get ghost index
+int 5                   ; get ghost position
+jlt 55,a,c              ; jump to #left
+jgt 47,a,c              ; jump to #right
+jlt 43,b,d              ; jump to #up
+jgt 51,b,d              ; jump to #down
+
+;#noChaseMode
+int 3                   ; get ghost index
+int 5                   ; get ghost position
+jeq 43,g,0              ; jump to #up
+jeq 47,g,1              ; jump to #right
+jeq 51,g,2              ; jump to #down
+jeq 55,g,3              ; jump to #left
+
+;#up
+mov e, 0                ; set flag to y
+mov g, 0                ; set direction
+dec b                   ; decrease y-ordinate
+jeq 58,1,1              ; jump to #checkWall
+
+;#right
+mov e, 1                ; set flag to x
+mov g, 1                ; set direction
+inc a                   ; increase x-ordinate
+jeq 58,1,1              ; jump to #checkWall
+
+;#down
+mov e, 0                ; set flag to y
+mov g, 2                ; set direction
+inc b                   ; increase y-ordinate
+jeq 58,1,1              ; jump to #checkWall
+
+;#left
+mov e, 1                ; set flag to x
+mov g, 3                ; set direction
+dec a                   ; decrease x-ordinate
+
+;#checkWall
+int 7                   ; get map at (x, y)
+jeq 1,a,0               ; if wall, try next direction ; jump to #newDirection
+
+;#checkBack
+int 3                   ; get ghost index
+int 6                   ; get direction in B
+mov d, g                ; copy new direction to D
+xor d, b                ; if directions are opposed, result of xor is 2
+
+jeq 66,d,2              ; jump to #opposedDirections
+jeq 67,1,1              ; jump to #makeMove
+
+;#opposedDirections
+jlt 1,h,4               ; try new direction if opposed and haven't tried all directions ; jump to #newDirection
+
+;#makeMove
+mov a, g                ; set final direction
+int 0
+int 3                   ; get ghost index
+inc [a]                 ; update step count for ghost
+hlt

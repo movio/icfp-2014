@@ -1,4 +1,4 @@
-; ghost0 chases lambda-man and runs from him when in fright mode
+; ghost 0 chases lambda-man and runs from him when in fright mode
 
 ;#start
 int 1           ; get lambda-man coordinates

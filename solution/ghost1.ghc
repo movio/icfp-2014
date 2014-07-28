@@ -1,5 +1,5 @@
 ; ghost 1 moves randomly if we are not in fright mode
-; tries to get away from Lambda-Man if we are in fright mode
+; tries to get away from lambda-man if we are in fright mode
 
 mov f, 255              ; reset minimum moves
 mov h, 0                ; reset counter for direction retries
