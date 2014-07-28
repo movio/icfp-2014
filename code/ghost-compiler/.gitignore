@@ -1,0 +1,13 @@
+bin
+target
+temp
+classes
+export.xml
+*.bak
+*.orig
+.cache
+.project
+.classpath
+.settings
+ctags
+.lib-src
