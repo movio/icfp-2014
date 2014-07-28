@@ -9,6 +9,15 @@
                                    (= (car next) (cdr next)))))
       0))
 
+  (defun first-index-of (lst pred)
+    (first-index-of-iter lst pred 0))
+  (defun first-index-of-iter (lst pred index)
+    (if (atom? lst)
+      -1
+      (if (pred (car lst))
+        index
+        (first-index-of-iter (cdr lst) pred (+ 1 index)))))
+
   (defun exists (lst pred)
     (fold-left lst 0 (lambda (acc next)
                        (if (= acc 1)

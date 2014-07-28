@@ -2,26 +2,43 @@
 
 (
   ;; constants
-  (defun PATH_LENGTH () 4)
+  (defun PATH_LENGTH () 5)
   (defun SCORES ()
     (mklist
-      0      ;; wall
-      10      ;; empty
-      20      ;; pill
-      30      ;; power pill
-      40      ;; fruit (if exists)
-      -10))   ;; ghost
+      0       ;; wall
+      0       ;; empty
+      10      ;; pill
+      50      ;; power pill
+      300     ;; fruit (if exists)
+      -100    ;; ghost (normal)
+      600     ;; ghost (fright)
+      0))     ;; ghost (invisible)
 
   ;; entry point for each move
 
   (defun step (ai-state Q)
     (let ((lman-pos        (get-lman-pos Q))
+          (urdl            (find-urdl lman-pos))
           (paths           ((get-paths-from Q) lman-pos))
-          (score-at-pos    (get-score-at-pos Q)))
-      (dbg (map paths (lambda (path)
-                        (let ((score (fold-left path 0 (lambda (total-score next-pos)
-                                                         (+ total-score (score-at-pos next-pos))))))
-                          (cons score path)))))))
+          (score-at-pos    (get-score-at-pos Q))
+          (scored-paths    (map paths
+                                (lambda (path)
+                                  (cons
+                                    (fold-left path 0 (lambda (total next-pos)
+                                                        (+ total (score-at-pos next-pos))))
+                                    path))))
+          (best-path       (fold-left scored-paths
+                                      (cons -10000 0)
+                                      (lambda (max next)
+                                        (if (> (car next) (car max))
+                                          next
+                                          max))))
+          (best-path-pos   (car (cdr best-path)))
+          (best-path-dir   (first-index-of urdl (lambda (urdl-pos) (teq urdl-pos best-path-pos)))))
+      ;;(dbg scored-paths)
+      ;;(dbg best-path)
+      ;;(dbg best-path-dir)
+      (cons 0 best-path-dir)))
 
   ;; AI !
 
