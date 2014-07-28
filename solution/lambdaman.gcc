@@ -1,409 +1,1092 @@
-LDC 0
-LDF 4
+LDC 0 ; main
+LDF 1086
 CONS
 RTN
-
-;$STEP: ;AISTATE GAMESTATE
-LDC 0  ; NEW AISTATE
-
-LD 0 1 ; GAME STATE
-LDC 1
-LDF 94
-AP 2   ; PACMAN STATE
-LDC 1
-LDF 94
-AP 2   ; PACMAN (X Y)
-LDF 118
-AP 1   ; [U D L R]
-
-LD 0 1 ; GAME STATE
-LDC 0
-LDF 94
-AP 2   ; WORLD
-LDF 69
-AP 1
-LDF 277
-AP 2
-
-; SET 3/4/5/6 TO 1
-LDF 76
-LDF 277
-AP 2
-
-; ZIP-WITH-INDEX
-LDF 186
-AP 1
-
-BRK
-
-; FILTER OUT OPPOSITE DIRECTION
-LDC 2
-LDC 3
-LDC 0
-LDC 1
-LDC 4
-LDF 261
-AP 1
-LD 0 1 ; GAME STATE
-LDC 1
-LDF 94
-AP 2   ; PACMAN STATE
-LDC 2
-LDF 94
-AP 2   ; PACMAN DIRECTION
-LDF 94
-AP 2   ; OPPOSITE DIRECTION
-LDF 58
-AP 1
-LDF 168
-AP 2
-
-BRK
-
-; MAX BY CAR
-LDC 0
-LDC 0
-CONS ; (0 0)
-LDF 84
-LDF 301
-AP 3
-
-; GET DIRECTION FROM CONS
+LD 1 0 ; $lambda-57
 CDR
-
-; DONE!
-CONS
+LDF 969
+AP 1
 RTN
-
-;$GEN-CDR-NOT-EQ: ;X
-LDF 60
-RTN
-;$GEN-CDR-NOT-EQ-INNER: ;X
-LD 1 0
-LD 0 0
-CDR
-CEQ
-TSEL 65 67
-;$GEN-CDR-NOT-EQ-INNER-EQ:
-LDC 0
-RTN
-;$GEN-CDR-NOT-EQ-INNER-NEQ:
-LDC 1
-RTN
-
-;$GEN-WORLD-FUN: ;WORLD
-LDF 71
-RTN
-;$GEN-WORLD-FUN-INNER: ;(X Y)
-LD 1 0
-LD 0 0
-LDF 108
-AP 2
-RTN
-
-;$NORMALIZE: ;X
-LD 0 0
-LDC 3
-CGTE
-TSEL 80 82
-;$NORMALIZE-TRUE:
-LDC 1
-RTN
-;$NORMALIZE-FALSE:
-LD 0 0
-RTN
-
-;$MAX-BY-CAR: ; MAX NEXT
-LD 0 0
-CAR
+LDC 0 ; pow-iter
 LD 0 1
-CAR
 CGTE
-TSEL 90 92
-;$MAX-BY-CAR-FIRST:
-LD 0 0
+SEL 14 16
 RTN
-;$MAX-BY-CAR-SECOND:
+LD 0 2 ; $pow-iter-left-branch-133
+JOIN
+LD 0 0 ; $pow-iter-right-branch-134
 LD 0 1
-RTN
-
-;$NTH: ;LST I
-LD 0 1 ;I
-LDC 0
-CEQ
-TSEL 98 101
-;$NTH1:
-LD 0 0 ;LST
-CAR
-RTN
-;$NTH2:
-LD 0 0 ;LST
-CDR
-LD 0 1 ;I
 LDC 1
 SUB
-LDF 94
-TAP 2
-
-;$WORLD: ;WORLD (X Y)
-LD 0 0 ;WORLD
-LD 0 1
-CDR    ;Y
-LDF 94
+LD 0 2
+LD 0 0
+MUL
+LDF 9
+AP 3
+JOIN
+LD 0 0 ; $lambda-110
+LDC 3
+CGTE
+SEL 31 33
+RTN
+LDC 1 ; $$lambda-110-left-branch-111
+JOIN
+LD 0 0 ; $$lambda-110-right-branch-112
+JOIN
+LD 0 0 ; $lambda-102
+ATOM
+SEL 39 43
+RTN
+LD 1 0 ; $$lambda-102-left-branch-103
+LDC 0
+CONS
+JOIN
+LD 0 0 ; $$lambda-102-right-branch-105
+LDF 403
+LDF 71
 AP 2
-LD 0 1
-CAR    ;X
-LDF 94
+JOIN
+LD 0 0 ; $lambda-67
+LDF 449
+AP 1
+LDC 0
+LDF 879
+LDF 167
+AP 3
+LD 0 0
+CONS
+RTN
+LD 0 0 ; range-iter
+LDC 0
+CEQ
+SEL 63 65
+RTN
+LD 0 1 ; $range-iter-left-branch-23
+JOIN
+LD 0 0 ; $range-iter-right-branch-25
+LDC 1
+SUB
+LDF 860
+AP 1
+JOIN
+LD 0 0 ; map
+LDC 0
+LDF 983
+LDF 167
+AP 3
+LDF 292
+AP 1
+RTN
+LDF 809 ; get-score-at-pos
+LD 0 0
+LDF 804
+AP 1
+LDF 712
+AP 2
+LDF 493
+AP 1
+RTN
+LD 1 0 ; $lambda-33
+LDF 48
+LDF 71
+AP 2
+LDF 580
+AP 1
+RTN
+LD 0 0 ; $lambda-10
+LDC 1
+CEQ
+SEL 100 102
+RTN
+LDC 1 ; $$lambda-10-left-branch-11
+JOIN
+LD 0 1 ; $$lambda-10-right-branch-12
+LD 1 1
+AP 1
+JOIN
+LD 0 0 ; range
+LDC 0
+LDF 58
 AP 2
 RTN
-
-;$URDL: ;(X Y) RETURNS [U R D L]
-LD 0 0
-LDF 134
+LD 0 0 ; teq
+LDF 735
 AP 1
-LD 0 0
-LDF 142
+LD 0 1
+LDF 735
 AP 1
-LD 0 0
-LDF 150
+CEQ
+SEL 120 125
+RTN
+LD 0 0 ; $teq-left-branch-121
+LD 0 1
+LDF 1057
+AP 2
+JOIN
+LDC 0 ; $teq-right-branch-122
+JOIN
+LD 0 0 ; get-fruit-state
+LDC 3
+LDF 407
+AP 2
+RTN
+LD 3 0 ; $lambda-77
+LDF 127
 AP 1
+LDF 802
+AP 1
+RTN
+LD 0 1 ; $lambda-17
+LD 1 1
+AP 1
+SEL 143 147
+RTN
+LD 0 1 ; $$lambda-17-left-branch-18
 LD 0 0
+CONS
+JOIN
+LD 0 0 ; $$lambda-17-right-branch-19
+JOIN
+LD 0 1 ; $lambda-15
+LD 0 0
+CONS
+RTN
+LD 1 1 ; $lambda-90
+CDR
+LDF 327
+AP 1
+RTN
+LDF 809 ; get-paths-from
+LD 0 0
+LDF 804
+AP 1
+LDF 712
+AP 2
+LDF 355
+AP 1
+RTN
+LD 0 0 ; fold-left
+ATOM
+SEL 171 173
+RTN
+LD 0 1 ; $fold-left-left-branch-13
+JOIN
+LD 0 0 ; $fold-left-right-branch-14
+CDR
+LD 0 1
+LD 0 0
+CAR
+LD 0 2
+AP 2
+LD 0 2
+LDF 167
+AP 3
+JOIN
+LD 0 0 ; $lambda-37
+LDF 761
+LDF 71
+AP 2
+LDF 823
+AP 1
+RTN
+LD 0 0 ; $lambda-41
+LDC -1
+CGT
+SEL 200 202
+RTN
+LDC -1 ; $$lambda-41-right-branch-45
+JOIN
+LD 0 1 ; $$lambda-41-left-branch-44
+JOIN
+LD 0 0 ; $$lambda-41-left-branch-42
+JOIN
+LD 2 0 ; $$lambda-41-right-branch-46
+LDF 464
+LDF 945
+AP 2
+SEL 198 196
+JOIN
+LD 0 0 ; $lambda-81
+LDC -1
+CGT
+SEL 225 234
+RTN
+LDF 274 ; $$lambda-81-right-branch-85
+AP 0
+LD 1 0
+LDF 407
+AP 2
+JOIN
+LDF 274 ; $$lambda-81-left-branch-84
+AP 0
+LDC 1
+LDF 407
+AP 2
+JOIN
+LD 5 0 ; $$lambda-81-left-branch-83
+LD 0 0
+LDF 407
+AP 2
+LDF 855
+AP 1
+LDF 753
+AP 1
+JOIN
+LD 1 0 ; $$lambda-81-right-branch-86
+LDC 4
+CEQ
+LDC 0
+LD 3 0
+CEQ
+LDF 741
+AP 2
+LD 1 0
+LDC 5
+CGTE
+LDF 616
+AP 2
+SEL 219 213
+JOIN
+LD 0 0 ; find-urdl
+CAR
+LD 0 0
+CDR
+LDF 359
+AP 2
+RTN
+LDC 0 ; not
+LD 0 0
+CEQ
+RTN
+LD 1 0 ; $lambda-70
+LD 4 0
+AP 1
+LDF 385
+AP 1
+RTN
+LD 3 0 ; $lambda-31
+LD 4 1
 LDF 158
 AP 1
+AP 1
+LDF 838
+AP 1
+RTN
+LDC 0 ; SCORES
+LDC 0
+LDC 10
+LDC 50
+LDC 300
+LDC -100
+LDC 600
+LDC 0
+LDC 0
+CONS
+CONS
+CONS
+CONS
+CONS
+CONS
+CONS
+CONS
+RTN
+LD 0 0 ; reverse
+LDC 0
+LDF 149
+LDF 167
+AP 3
+RTN
+LD 0 1 ; $lambda-49
+CAR
+LDF 996
+AP 1
+RTN
+LD 0 0 ; zip-iter
+ATOM
+LD 0 1
+ATOM
+LDF 616
+AP 2
+SEL 311 313
+RTN
+LD 0 2 ; $zip-iter-left-branch-26
+JOIN
+LD 0 0 ; $zip-iter-right-branch-27
+CDR
+LD 0 1
+CDR
+LD 0 0
+CAR
+LD 0 1
+CAR
+CONS
+LD 0 2
+CONS
+LDF 303
+AP 3
+JOIN
+LD 3 0 ; $lambda-91
+LD 1 0
+LDF 668
+AP 1
+LDF 111
+AP 2
+SEL 335 337
+RTN
+LD 0 0 ; $$lambda-91-left-branch-92
+JOIN
+LDC -1 ; $$lambda-91-right-branch-93
+JOIN
+LD 0 1 ; $lambda-114
+CAR
+LD 0 0
+CAR
+CGT
+SEL 346 348
+RTN
+LD 0 1 ; $$lambda-114-left-branch-115
+JOIN
+LD 0 0 ; $$lambda-114-right-branch-116
+JOIN
+LD 0 0 ; get-ghost-states
+LDC 2
+LDF 407
+AP 2
+RTN
+LDF 468 ; $lambda-95
+LDF 981
+AP 1
+RTN
+LD 0 0 ; $lambda-109
+LD 0 1
+LDC 1
+SUB
+CONS
+LD 0 0
+LDC 1
+ADD
+LD 0 1
+CONS
+LD 0 0
+LD 0 1
+LDC 1
+ADD
+CONS
+LD 0 0
+LDC 1
+SUB
+LD 0 1
+CONS
+LDC 0
+CONS
+CONS
+CONS
+CONS
+RTN
+LDC 0 ; $lambda-71
+LD 0 0
+CEQ
+SEL 392 394
+LDF 951
+AP 1
+RTN
+LDC 0 ; $$lambda-71-left-branch-73
+JOIN
+LDC 10000 ; $$lambda-71-right-branch-74
+LD 0 0
+MUL
+LDC 2
+LD 1 0
+LDF 458
+AP 2
+DIV
+JOIN
+LD 0 0 ; $lambda-104
+LD 2 0
+CONS
+RTN
+LDC 0 ; nth
+LD 0 1
+CGTE
+SEL 417 421
+RTN
+LD 0 0 ; $nth-right-branch-118
+CAR
+JOIN
+LD 0 0 ; $nth-left-branch-117
+JOIN
+LD 0 0 ; $nth-left-branch-119
+ATOM
+SEL 415 412
+JOIN
+LD 0 0 ; $nth-right-branch-120
+CDR
+LD 0 1
+LDC 1
+SUB
+LDF 407
+AP 2
+JOIN
+LD 0 0 ; leq
+LDF 735
+AP 1
+LD 0 1
+LDF 735
+AP 1
+CEQ
+SEL 438 447
+RTN
+LD 0 0 ; $leq-left-branch-4
+LD 0 1
+LDF 1049
+AP 2
+LDC 1
+LDF 638
+LDF 167
+AP 3
+JOIN
+LDC 0 ; $leq-right-branch-5
+JOIN
+LD 0 0 ; zip-with-index
+LD 0 0
+LDF 735
+AP 1
+LDF 106
+AP 1
+LDF 1049
+AP 2
+RTN
+LD 0 0 ; pow
+LD 0 1
+LDC 1
+LDF 9
+AP 3
+RTN
+LD 1 1 ; $lambda-43
+LD 0 0
+CEQ
+RTN
+LD 0 0 ; $lambda-98
+LD 1 0
+AP 1
+LDC 0
+CGT
+RTN
+LD 3 0 ; $lambda-64
+LD 2 1
+CDR
+CAR
+LDF 111
+AP 2
+SEL 482 491
+RTN
+LD 1 0 ; $$lambda-64-left-branch-65
+LD 2 1
+CAR
+ADD
+LD 0 0
+LDC 1
+ADD
+CONS
+JOIN
+LD 2 0 ; $$lambda-64-right-branch-66
+JOIN
+LD 1 0 ; $lambda-75
+LDF 350
+AP 1
+LDF 819
+AP 1
+RTN
+LD 1 0 ; $lambda-80
+LD 3 0
+AP 1
+LDF 208
+AP 1
+RTN
+LDC 6 ; PATH_LENGTH
+RTN
+LD 1 0 ; $lambda-51
+LD 0 0
+CEQ
+SEL 518 522
+RTN
+LD 2 0 ; $$lambda-51-right-branch-54
+JOIN
+LD 2 1 ; $$lambda-51-left-branch-53
+LDC 0
+CONS
+JOIN
+LD 2 1 ; $$lambda-51-left-branch-52
+LD 2 0
+CONS
+JOIN
+LD 1 0 ; $$lambda-51-right-branch-55
+LD 0 0
+CGT
+SEL 514 512
+JOIN
+LD 1 1 ; $lambda-69
+CDR
+LDF 260
+AP 1
+RTN
+LD 1 1 ; $lambda-128
+LD 1 2
+LD 1 3
+LD 1 4
+LD 0 0
+LD 1 0
+AP 5
+RTN
+LD 0 0 ; $lambda-88
+LDC -1
+CGT
+SEL 545 547
+RTN
+LD 0 0 ; $$lambda-88-left-branch-89
+JOIN
+LD 0 1 ; $$lambda-88-right-branch-94
+CAR
+LDF 153
+AP 1
+JOIN
+LDC 1 ; tlength
+LD 0 0
+LDF 735
+AP 1
+ADD
+RTN
+LD 0 0 ; first-index-of
+LD 0 1
+LDC 0
+LDF 673
+AP 3
+RTN
+LD 0 0 ; get-ghost-dir
+LDC 2
+LDF 407
+AP 2
+RTN
+LDC 0 ; $lambda-39
+LD 0 0
+CONS
+RTN
+LD 0 0 ; $lambda-47
+LD 9 0
+ADD
 LDC 4
-LDF 261
-AP 1
-RTN
-
-;$U: ;(X Y)
-LD 0 0
-CAR
-LD 0 0
-CDR
-LDC 1
-SUB
-CONS
-RTN
-
-;$R: ;(X Y)
-LD 0 0
-CAR
-LDC 1
-ADD
-LD 0 0
-CDR
-CONS
-RTN
-
-;$D: ;(X Y)
-LD 0 0
-CAR
-LD 0 0
-CDR
-LDC 1
-ADD
-CONS
-RTN
-
-;$L: ;(X Y)
-LD 0 0
-CAR
-LDC 1
-SUB
-LD 0 0
-CDR
-CONS
-RTN
-
-
-BRK
-; LIST FUNCTIONS
-BRK
-
-;$FILTER: ; LST PRED
-LD 0 0   ; LST
-LDC 0    ; NIL
-LDF 176
-LDF 301
-AP 3
-LDF 291
-AP 1
-RTN
-;$FILTER-PRED: ; ACC NEXT
-LD 0 1   ; NEXT
-LD 1 1   ; PRED
-AP 1
-TSEL 180 184
-;$FILTER-PRED-TRUE:
-LD 0 1   ; NEXT
-LD 0 0   ; ACC
-CONS
-RTN
-;$FILTER-PRED-FALSE:
-LD 0 0   ; ACC
-RTN
-
-;$ZIP-WITH-INDEX: ; LST
-LD 0 0       ; LST
-LD 0 0
-LDF 224
-AP 1         ; LEN LST
-LDF 241
-AP 1         ; 0..N
-LDF 195
-AP 2         ; ZIP LST 0..N
-RTN
-
-;$ZIP: ; A B
-LD 0 0
-LD 0 1
-LDC 0  ; NIL
-LDF 201
-AP 3
-RTN
-;$ZIP_ITER: ; A B OUT
-LD 0 0
-ATOM
-TSEL 207 204
-;$ZIP_NEXT:
-LD 0 1
-ATOM
-TSEL 207 211
-;$ZIP_DONE:
-LD 0 2
-LDF 291
-AP 1
-RTN
-;$ZIP_CONT:
-LD 0 0
-CDR    ; TAIL A
-LD 0 1
-CDR    ; TAIL B
-LD 0 0
-CAR    ; HEAD A
-LD 0 1
-CAR    ; HEAD B
-CONS   ; (A B)
-LD 0 2
-CONS   ; (A B) :: OUT
-LDF 201
-TAP 3
-
-;$LENGTH: ;LST
-LDC 0
-LD 0 0
-LDF 229
+LDF 764
 AP 2
 RTN
-;$LENGTH_ITER: ; LEN LST
-LD 0 1
-ATOM
-TSEL 232 234
-;$LENGTH_DONE:
-LD 0 0
+LD 3 0 ; $lambda-34
+LDF 727
+LDF 71
+AP 2
+LDF 1002
+AP 1
 RTN
-;$LENGTH_CONT:
-LD 0 0
-LDC 1
-ADD     ; LEN+1
-LD 0 1
-CDR     ; TAIL LST
-LDF 229
-TAP 2
-
-;$RANGE: ;N
-LDC 0
-LD 0 0 ; N
-LDF 246
+LD 0 0 ; get-lman-dir
+LDF 1009
+AP 1
+LDC 2
+LDF 407
 AP 2
 RTN
-;$RANGE_ITER: ; I N
+LD 0 1 ; $lambda-21
 LD 0 0
+CONS
+RTN
+LD 0 0 ; $lambda-107
+LD 1 0
+LDF 111
+AP 2
+RTN
+LDF 532 ; close-4-1
+RTN
+LD 0 0 ; $lambda-97
+LDC 0
+CONS
+LDC 0
+CONS
+LD 1 0
+LDF 505
+AP 0
+LDF 884
+AP 3
+RTN
+LDC 0 ; or
+LDC 0
+LD 0 0
+CEQ
+CEQ
+LDC 0
+LDC 0
 LD 0 1
 CEQ
-TSEL 250 254
-;$RANGE_DONE:
-LD 0 1  ; N
-LDF 261
+CEQ
+ADD
+LDC 0
+CGT
+RTN
+LD 1 1 ; $lambda-28
+LDF 587
+AP 1
+LDF 955
 AP 1
 RTN
-;$RANGE_CONT:
-LD 0 0 ; I, LEFT ON STACK FOR MK-LIST
+LDC -2000000000 ; BAD_PATH
+RTN
+LDC 0 ; $lambda-1
 LD 0 0
+CEQ
+SEL 643 645
+RTN
+LDC 0 ; $$lambda-1-left-branch-2
+JOIN
+LD 0 1 ; $$lambda-1-right-branch-3
+CAR
+LD 0 1
+CDR
+CEQ
+JOIN
+LD 0 0 ; $lambda-101
+CAR
+LDF 249
+AP 1
+LDF 867
+LDF 704
+AP 2
+LDF 35
+AP 1
+RTN
+LD 0 0 ; mapcat
+LD 0 1
+LDF 71
+AP 2
+LDF 696
+AP 1
+RTN
+LD 0 0 ; get-ghost-pos
 LDC 1
-ADD    ; I+1
-LD 0 1 ; N
-LDF 246
-TAP 2
-
-
-;$MK-LIST: ;X
-LDC 0   ; NIL
+LDF 407
+AP 2
+RTN
+LD 0 0 ; first-index-of-iter
+ATOM
+SEL 688 690
+RTN
+LD 0 0 ; $first-index-of-iter-right-branch-8
+CDR
+LD 0 1
+LDC 1
+LD 0 2
+ADD
+LDF 673
+AP 3
+JOIN
+LD 0 2 ; $first-index-of-iter-left-branch-7
+JOIN
+LDC -1 ; $first-index-of-iter-left-branch-6
+JOIN
+LD 0 0 ; $first-index-of-iter-right-branch-9
+CAR
+LD 0 1
+AP 1
+SEL 686 677
+JOIN
+LD 0 0 ; concat
+LDC 0
+LDF 790
+LDF 167
+AP 3
+LDF 292
+AP 1
+RTN
+LD 0 0 ; filter
+LDC 0
+LDF 138
+LDF 167
+AP 3
+LDF 292
+AP 1
+RTN
+LDF 1081 ; close-1-1
+RTN
+LD 0 0 ; $lambda-62
+CAR
+LDF 964
+AP 1
+RTN
+LD 1 0 ; $lambda-87
+LDF 449
+AP 1
+LDC -1
+LDF 540
+LDF 167
+AP 3
+RTN
+LD 1 0 ; $lambda-61
+LDC 0
+LDC 0
+CONS
+LDF 714
+LDF 167
+AP 3
+RTN
+LD 0 0 ; length
+LDC 0
+LDF 834
+LDF 167
+AP 3
+RTN
+LDC 0 ; and
+LDC 0
 LD 0 0
+CEQ
+CEQ
+LDC 0
+LDC 0
+LD 0 1
+CEQ
+CEQ
+MUL
+RTN
+LDF 274 ; $lambda-82
+AP 0
+LDC 5
+LD 0 0
+ADD
+LDF 407
+AP 2
+RTN
+LD 0 0 ; $lambda-48
+CDR
+RTN
+LD 0 0 ; mod
+LD 0 1
+CGTE
+SEL 778 785
+RTN
+LD 0 0 ; $mod-right-branch-131
+LD 0 1
+ADD
+LD 0 1
+LDF 764
+AP 2
+JOIN
+LD 0 0 ; $mod-left-branch-130
+JOIN
+LD 0 0 ; $mod-left-branch-129
+LD 0 1
+SUB
+LD 0 1
+LDF 764
+AP 2
+JOIN
+LD 0 0 ; $mod-right-branch-132
+LDC 0
+CGTE
+SEL 776 769
+JOIN
+LD 0 1 ; $lambda-20
+LD 0 0
+LDF 594
+LDF 167
+AP 3
+RTN
+LD 0 0 ; $lambda-40
+LDC -1
+LDF 191
+LDF 167
+AP 3
+RTN
+LDF 849 ; $lambda-78
+RTN
+LD 0 0 ; get-world
+LDC 0
+LDF 407
+AP 2
+RTN
+LD 0 0 ; at-world
+LD 0 1
+CDR
+LDF 407
+AP 2
+LD 0 1
+CAR
+LDF 407
+AP 2
+RTN
+LDF 719 ; $lambda-76
+LDF 132
+AP 1
+RTN
+LDC 4 ; $lambda-38
+LDF 106
+AP 1
+LDF 573
+LDF 71
+AP 2
+LDF 796
+AP 1
+LDF 569
+AP 1
+RTN
+LD 0 0 ; $lambda-22
+LDC 1
+ADD
+RTN
+LD 5 1 ; $lambda-32
+LDF 79
+AP 1
+LDF 88
+AP 1
+RTN
+LD 0 0 ; $lambda-56
+CAR
+LDF 4
+AP 1
+RTN
+LD 0 0 ; $lambda-79
+LD 4 0
+AP 1
+LDF 499
+AP 1
+RTN
+LD 0 0 ; get-ghost-vit
+LDC 0
+LDF 407
+AP 2
+RTN
+LD 0 0 ; $lambda-24
+LD 0 0
+LD 1 1
+CONS
+LDF 58
+AP 2
+RTN
+LD 1 0 ; $lambda-106
+LDF 598
+LDF 945
+AP 2
+LDF 256
+AP 1
+LD 0 0
+LD 2 1
+AP 1
+LDF 741
+AP 2
+RTN
+LD 0 1 ; $lambda-68
+CAR
+LDF 527
+AP 1
+RTN
+LDC 0 ; get-paths-iter
+LD 0 2
+CEQ
+SEL 889 894
+RTN
+LD 0 0 ; $get-paths-iter-left-branch-100
+LDF 905
+LDF 71
+AP 2
+JOIN
+LD 0 0 ; $get-paths-iter-right-branch-108
+LDF 651
+LDF 661
+AP 2
+LD 0 1
+LD 0 2
+LDC 1
+SUB
+LDF 884
+AP 3
+JOIN
+LD 0 0 ; $lambda-99
+LDF 292
+AP 1
+CDR
+RTN
+LD 0 0 ; $lambda-36
+LDF 449
+AP 1
+LDF 636
+AP 0
+LDC -1
+CONS
+LDC 0
+CONS
+LDF 298
+LDF 167
+AP 3
+LDF 184
+AP 1
+RTN
+LD 0 0 ; $lambda-113
+CDR
+LDC 2
+LDC 3
+LDC 0
+LDC 1
+LDC 0
+CONS
+CONS
+CONS
+CONS
+LD 1 0
+LDF 587
+AP 1
+LDF 407
+AP 2
+CEQ
+LDF 256
+AP 1
+RTN
+LD 0 0 ; exists
+LDC 0
+LDF 95
+LDF 167
+AP 3
+RTN
+LD 4 0 ; $lambda-72
+LD 0 0
+ADD
+RTN
+LD 2 1 ; $lambda-29
+LDF 350
+AP 1
+CAR
+LDF 564
+AP 1
+LDF 1014
+AP 1
+RTN
+LD 1 0 ; $lambda-63
+CDR
+LDF 474
+AP 1
+RTN
+LDC 0 ; $lambda-58
+LD 0 0
+CEQ
+SEL 974 977
+RTN
+LDF 636 ; $$lambda-58-left-branch-59
+AP 0
+JOIN
+LD 1 0 ; $$lambda-58-right-branch-60
+LD 0 0
+DIV
+JOIN
+LDF 605 ; $lambda-96
+RTN
+LD 0 1 ; $lambda-16
+LD 1 1
+AP 1
+LD 0 0
+CONS
+RTN
+LD 0 0 ; get-lman-pos
+LDF 1009
+AP 1
+LDC 1
+LDF 407
+AP 2
+RTN
+LD 1 0 ; $lambda-50
+CAR
+CAR
+LDF 507
+AP 1
+RTN
+LD 0 0 ; $lambda-35
+LDF 844
+LDF 71
+AP 2
+LDF 910
+AP 1
+RTN
+LD 0 0 ; get-lman-state
+LDC 1
+LDF 407
+AP 2
+RTN
+LD 2 0 ; $lambda-30
+LDF 249
+AP 1
 LDF 266
 AP 1
 RTN
-
-;$MK-CONS: ;X
+LD 0 0 ; old-ai
+LDF 989
+AP 1
+LDF 249
+AP 1
+LDF 809
 LD 0 0
+LDF 804
+AP 1
+LDF 712
+AP 2
+LDF 71
+AP 2
+LDF 26
+LDF 71
+AP 2
+LDF 449
+AP 1
+LDF 925
+LDF 704
+AP 2
 LDC 0
-CEQ
-TSEL 270 271
-;$MK-CONS-ZERO:
-RTN
-;$MK-CONS-ELSE:
+LDC 0
 CONS
-LD 0 0
-LDC 1
-SUB
-LDF 266
-TAP 1
-
-;$MAP: ; LST FUN
-LD 0 0   ; LST
-LDC 0    ; NIL
-LDF 285
-LDF 301
+LDF 339
+LDF 167
 AP 3
-LDF 291
-AP 1
+CDR
 RTN
-;$APPLY-FUN: ; ACC NEXT
-LD 0 1   ; NEXT
-LD 1 1   ; FUN
-AP 1
-LD 0 0   ; ACC
-CONS
-RTN
-
-;$REVERSE: ; LST
-LD 0 0   ; LST
-LDC 0    ; NIL
-LDF 297
-LDF 301
-AP 3
-RTN
-;$REVERSE_FUN: ; ACC NEXT
-LD 0 1   ; NEXT
-LD 0 0   ; ACC
-CONS
-RTN
-
-;$FOLD-LEFT: ; LST ACC FUN
-LD 0 0   ; LST
-ATOM
-TSEL 304 306
-;$FOLD-LEFT-BASE:
-LD 0 1   ; ACC
-RTN
-;$FOLD-LEFT-REC:
-LD 0 0
-CDR      ; TAIL LST
+LD 0 0 ; zip
 LD 0 1
-LD 0 0
+LDC 0
+LDF 303
+AP 3
+LDF 292
+AP 1
+RTN
+LD 0 0 ; teq-iter
+ATOM
+SEL 1070 1074
+RTN
+LDC 0 ; $teq-iter-right-branch-125
+JOIN
+LD 0 0 ; $teq-iter-left-branch-124
+CDR
+LD 0 1
+CDR
+LDF 1057
+AP 2
+JOIN
+LD 0 0 ; $teq-iter-left-branch-123
+LD 0 1
+CEQ
+JOIN
+LD 0 0 ; $teq-iter-right-branch-126
 CAR
-LD 0 2
-AP 2     ; FUN ACC (HEAD LIST)
-LD 0 2   ; FUN
-LDF 301
-TAP 3
+LD 0 1
+CAR
+CEQ
+SEL 1063 1061
+JOIN
+LD 1 1 ; $lambda-127
+LD 0 0
+LD 1 0
+AP 2
+RTN
+LD 0 1 ; step
+LDF 989
+AP 1
+LDF 630
+AP 1
+RTN
