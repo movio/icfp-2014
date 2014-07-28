@@ -1,6 +1,6 @@
 # gcc
 
-Small compiler for MLISP down to GCC written in Clojure.
+Small compiler for the other MLISP down to GCC written in Clojure.
 
 Main approach:
 
