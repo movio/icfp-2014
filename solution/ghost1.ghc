@@ -1,0 +1,90 @@
+; ghost 1 moves randomly if we are not in fright mode
+; tries to get away from Lambda-Man if we are in fright mode
+
+mov f, 255              ; reset minimum moves
+mov h, 0                ; reset counter for direction retries
+
+;#newDirection
+inc h
+mov d, 0                ; reset back direction flag
+jlt 6,g,3               ; jump to #increaseDirection
+mov g, 255              ; reset direction
+
+;#increaseDirection
+inc g
+int 3                   ; get ghost index
+int 6                   ; get vitality in A
+jeq 11,a,1              ; jump to #frightMode
+jeq 21,1,1              ; jump to #standardMode
+
+;#frightMode
+jgt 21,h,4  ; try random direction if moving away not possible ; jump to #standardMode
+int 1                   ; get lambda-man position
+mov c, a                ; move lambda-man x-ordinate into C
+mov d, b                ; move lambda-man y-ordinate into D
+int 3                   ; get ghost index
+int 5                   ; get ghost position
+jlt 36,a,c              ; jump to #left
+jgt 30,a,c              ; jump to #right
+jlt 27,b,d              ; jump to #up
+jgt 33,b,d              ; jump to #down
+
+;#standardMode
+int 3                   ; get ghost index
+int 5                   ; get ghost position
+jeq 27,g,0              ; jump to #up
+jeq 30,g,1              ; jump to #right
+jeq 33,g,2              ; jump to #down
+jeq 36,g,3              ; jump to #left
+
+;#up
+mov g, 0
+dec b                   ; decrease y-ordinate
+jeq 38,1,1              ; jump to #checkWall
+
+;#right
+mov g, 1
+inc a                   ; increase x-ordinate
+jeq 38,1,1              ; jump to #checkWall
+
+;#down
+mov g, 2
+inc b                   ; increase y-ordinate
+jeq 38,1,1              ; jump to #checkWall
+
+;#left
+mov g, 3
+dec a                   ; decrease x-ordinate
+
+;#checkWall
+int 7                   ; get map at (x, y)
+jeq 2,a,0               ; if wall, try next direction ; jump to #newDirection
+
+;#checkBack
+int 3                   ; get ghost index
+int 6                   ; get direction in B
+mov d, g                ; copy new direction to D
+xor d, b                ; if directions are opposed, result of xor is 2
+
+jeq 46,d,2              ; jump to #opposedDirections
+jeq 47,1,1              ; jump to #validDirection
+
+;#opposedDirections
+jlt 2,h,4               ; try new direction if opposed and haven't tried all directions ; jump to #newDirection
+
+;#validDirection
+jlt 50,[g],f            ; set new min if less ; jump to #newMin
+jeq 50,[g],f            ; set new min if equal ; jump to #newMin
+jeq 2,1,1               ; try new direction if not min ; jump to #newDirection
+
+;#newMin
+mov f, [g]              ; set minimum moves
+jlt 2,h,4               ; try all directions ; jump to #newDirection
+
+;#makeMove
+mov a, g                ; set final direction
+int 0
+int 3                   ; get ghost index
+int 6                   ; get current direction
+inc [b]
+hlt
